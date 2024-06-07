@@ -126,6 +126,7 @@ const userInformations = async (req, res) => {
 const updateUserInfos = async (req, res) => {
     try {
         let msg = "";
+        let msg2 = "";
         const datas = {
             pseudo: req.body.pseudo,
             firstname: req.body.firstname,
@@ -140,13 +141,21 @@ const updateUserInfos = async (req, res) => {
             return res.status(400).json({ msg: "L'email n'est pas dans un format valide" })
         }
 
-        const query =
-            "UPDATE users SET pseudo = ? , firstname = ? , bio = ? , email = ? WHERE id = ?";
-        await Query.write(query, datas);
+        const queryUser = "SELECT * FROM users WHERE users.pseudo = ?";
+        const [user] = await Query.findByValue(queryUser, datas.pseudo);
+    
+        if (user.length) {
+            res.status(200).json({ msg2: "Un utilisateur avec ce pseudo existe déjà" })
+        } else {
 
-        msg = "Vos informations ont été mise à jour !";
-        res.status(201).json({ msg });
+            const query =
+                "UPDATE users SET pseudo = ? , firstname = ? , bio = ? , email = ? WHERE id = ?";
+            await Query.write(query, datas);
+    
+            msg = "Vos informations ont été mise à jour !";
+            res.status(201).json({ msg });
 
+        }
 
     } catch (error) {
         throw Error(error);
@@ -179,7 +188,7 @@ const updatePassword = async (req, res) => {
     }
 };
 
-const DeleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
     try {
         let msg = ""
         const query =
@@ -196,4 +205,4 @@ const DeleteUser = async (req, res) => {
 
 
 
-export { check_token, createAccount, signin, getAllUsers, userInformations, updateUserInfos, updatePassword, DeleteUser };
+export { check_token, createAccount, signin, getAllUsers, userInformations, updateUserInfos, updatePassword, deleteUser };

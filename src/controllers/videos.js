@@ -50,6 +50,22 @@ const getVideoByTrickName = async (req, res) => {
     }
 };
 
+const getVideoById = async (req, res) => {
+    try {        
+        const query = "SELECT pseudo, videos.id as video_id, title, trick_name, videos.user_id, reaction_total, publication_date FROM videos JOIN users ON users.id = videos.user_id JOIN tricks ON tricks.id = videos.trick_id WHERE videos.id = ? ORDER BY videos.id DESC";
+        const [videos] = await Query.findByValue(query, req.params.video_id);
+
+        if (!videos.length) {
+            res.status(404).json({ msg: "Aucune vidéo pour cette figure" })
+        } else {
+            res.status(200).json(videos);
+            return;
+        }
+    } catch (error) {
+        throw Error(error)
+    }
+};
+
 
 const addVideo = async (req, res) => {
     try {
@@ -139,4 +155,4 @@ const addReaction = async (req, res) => {
 };
 
 
-export { getLastVideo, getVideoByUserID, getVideoByTrickName, addVideo, addReaction };
+export { getLastVideo, getVideoByUserID, getVideoByTrickName, getVideoById, addVideo, addReaction };

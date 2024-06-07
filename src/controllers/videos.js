@@ -154,5 +154,26 @@ const addReaction = async (req, res) => {
     }
 };
 
+const getReactionByUserIdAndVideoId = async (req, res) => {
+    try {
+        const datas = {
+            user_id : req.params.user_id,
+            video_id : req.params.video_id,
+        };
 
-export { getLastVideo, getVideoByUserID, getVideoByTrickName, getVideoById, addVideo, addReaction };
+        const query = "SELECT * FROM reactions WHERE user_id = ? AND video_id = ?";
+        const [reactions] = await Query.findByDatas(query, datas);
+
+        if (!reactions.length) {
+            res.status(404).json({ msg: "Le user n'a pas laissé de reaction sur cette vidéo" })
+        } else {
+            res.status(200).json([reactions]);
+            return;
+        }
+    } catch (error) {
+        throw Error(error)
+    }
+};
+
+
+export { getLastVideo, getVideoByUserID, getVideoByTrickName, getVideoById, addVideo, addReaction, getReactionByUserIdAndVideoId };
